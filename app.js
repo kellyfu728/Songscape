@@ -1,5 +1,13 @@
 const SCHEMA_VERSION = 1;
 const STORAGE_KEY = 'songscape.collection.v1';
+const PREFS_KEY = 'songscape.preferences.v1';
+const I18N = {
+  en:{nav:'Shop / Collection',backup:'Backup',settings:'Settings',add:'+ Add record',heroEyebrow:'Records · tapes · discs · memories',heroTitle:'Songscape<br>Media Store',heroCopy:'Welcome to your private music sanctuary. Every song worth keeping lives here with its liner notes.',pull:'Pull from the crate',pullHint:'Find an old favorite again',inventory:'Complete inventory',shelves:'The shelves',search:'Search title, artist, memory, or tag…',allTags:'All labels',favoritesOnly:'Favorites only',clear:'Clear filters',storeOffice:'Store office',language:'Language',help:'Help',replay:'Replay introduction',newArrivals:'New arrivals',recent:'Recently shelved',picks:'Personal picks',marked:'Marked by hand',archive:'Back catalog',older:'From the archive',items:'ITEMS',emptyStore:'The shelves are empty.',emptyStoreBody:'Choose a medium and put your first song on the shelf.',stockFirst:'Stock the first record',noResults:'Nothing is filed under those clues.',reset:'Clear filters',close:'Close',edit:'Edit liner notes',remove:'Remove from store',personalPick:'Personal pick',removePick:'Remove personal pick',saved:'Put on the shelf',formTitle:'Add a record',formIntro:'Start with why this song stayed. The catalog details can come later.',song:'Song title',artist:'Artist',linerQuestion:'Why do I keep coming back to this song?',cancel:'Cancel',step:'STORE GUIDE',skip:'Skip',next:'Next',finish:'Enter the store',steps:[['Welcome to Songscape','This is your private music store: songs become physical objects, and memories become liner notes.','welcome'],['Browse the shelves','Move through new arrivals, personal picks, and the back catalog like crates in a small record shop.','shelf'],['Pull out the media','Select a sleeve, cassette, CD, or DVD to remove it from its case and inspect it.','pull'],['Read the liner notes','Every record can hold the reason you kept returning to it—written exactly in your own words.','notes'],['Stock a new record','Choose what the song should become, then place it on your shelf.','add'],['Find something again','Pull from the crate to rediscover one of your own records—never an algorithmic recommendation.','crate']]},
+  zh:{nav:'唱片店 / 收藏',backup:'备份',settings:'设置',add:'＋ 添加介质',heroEyebrow:'唱片 · 磁带 · 光盘 · 记忆',heroTitle:'Songscape<br>私人音像店',heroCopy:'欢迎来到你的私人音乐圣所。每首舍不得忘记的歌，都和它的内页笔记一起留在这里。',pull:'从唱片箱抽一件',pullHint:'重新遇见一件旧藏',inventory:'完整库存',shelves:'全部货架',search:'搜索歌名、艺人、记忆或标签…',allTags:'所有标签',favoritesOnly:'只看私人推荐',clear:'清除筛选',storeOffice:'店铺办公室',language:'界面语言',help:'帮助',replay:'重新查看引导',newArrivals:'新到店',recent:'最近入库',picks:'私人推荐',marked:'亲手标记',archive:'旧藏目录',older:'来自收藏深处',items:'件介质',emptyStore:'货架还是空的。',emptyStoreBody:'选择一种介质，把第一首歌放上货架。',stockFirst:'放入第一件收藏',noResults:'这些线索下没有找到介质。',reset:'清除筛选',close:'关闭',edit:'编辑内页笔记',remove:'移出收藏',personalPick:'标为私人推荐',removePick:'取消私人推荐',saved:'放上货架',formTitle:'添加一件介质',formIntro:'先写下这首歌为什么留下来，其他目录信息可以以后再补。',song:'歌名',artist:'艺人',linerQuestion:'我为什么总会回到这首歌？',cancel:'取消',step:'店内引导',skip:'跳过',next:'下一步',finish:'进入唱片店',steps:[['欢迎来到 Songscape','这是你的私人音像店：歌曲变成实体介质，记忆成为内页笔记。','welcome'],['浏览货架','像逛一间小唱片店那样，翻看新到店、私人推荐与旧藏目录。','shelf'],['抽出介质','选择唱片、磁带、CD 或 DVD，把它从盒套中抽出并仔细查看。','pull'],['阅读内页笔记','每件收藏都可以保存你反复回到这首歌的理由，而且始终保留你的原话。','notes'],['添加一件收藏','选择这首歌应该成为哪种介质，然后把它放上你的货架。','add'],['再次遇见它','从唱片箱抽一件，会随机找回你自己的旧藏——这不是推荐算法。','crate']]}
+};
+let preferences = (()=>{try{return {...{language:(navigator.language||'en').toLowerCase().startsWith('zh')?'zh':'en',onboardingCompleted:{en:false,zh:false}},...JSON.parse(localStorage.getItem(PREFS_KEY)||'{}')}}catch{return {language:'en',onboardingCompleted:{en:false,zh:false}}}})();
+let language = preferences.language === 'zh' ? 'zh' : 'en';
+const t = key => I18N[language][key] ?? key;
 
 const escapeHtml = (value = '') => String(value).replace(/[&<>'"]/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]));
 const uid = () => crypto.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`;
@@ -34,6 +42,14 @@ let lastDiscoveredId = null;
 const filters = { query: '', tag: '', favorite: false };
 const $ = selector => document.querySelector(selector);
 const grid = $('#songGrid');
+function savePreferences(){try{localStorage.setItem(PREFS_KEY,JSON.stringify(preferences))}catch{}}
+function setFirstText(selector,text){const el=$(selector);if(!el)return;const node=[...el.childNodes].find(n=>n.nodeType===3&&n.textContent.trim());if(node)node.textContent=`${text} `;}
+function applyLanguage(){document.documentElement.lang=language==='zh'?'zh-CN':'en';document.title=language==='zh'?'Songscape · 私人音像店':'Songscape · Personal Media Store';$('.nav-link').textContent=t('nav');$('#backupButton').textContent=t('backup');$('#settingsButton').textContent=t('settings');$('#addButton').textContent=t('add');$('#heroEyebrow').textContent=t('heroEyebrow');$('#pageTitle').innerHTML=t('heroTitle');$('#heroCopy').textContent=t('heroCopy');$('#discoverButton span').textContent=t('pull');$('#discoverButton small').textContent=t('pullHint');$('#inventoryLabel').textContent=t('inventory');$('#collectionTitle').textContent=t('shelves');$('#searchInput').placeholder=t('search');$('.favorite-filter span').textContent=t('favoritesOnly');$('#resetFilters').textContent=t('clear');$('#settingsEyebrow').textContent=t('storeOffice');$('#settingsTitle').textContent=t('settings');$('#languageTitle').textContent=t('language');$('#helpTitle').textContent=t('help');$('#replayOnboarding').textContent=t('replay');$('#formTitle').textContent=t('formTitle');$('.form-intro').textContent=t('formIntro');setFirstText('label[for="unused"]','');document.querySelectorAll('.language-options button').forEach(b=>b.classList.toggle('selected',b.dataset.language===language));render();}
+let tutorialStep=0;
+function showOnboarding(force=false){if(!force&&preferences.onboardingCompleted?.[language])return;tutorialStep=0;renderTutorial();$('#onboardingDialog').showModal();}
+function renderTutorial(){const steps=t('steps'),[title,body,visual]=steps[tutorialStep];$('#tutorialCounter').textContent=`${t('step')} · ${tutorialStep+1}/${steps.length}`;$('#tutorialTitle').textContent=title;$('#tutorialBody').textContent=body;$('#onboardingVisual').className=`tutorial-visual tutorial-${visual}`;$('#tutorialSkip').textContent=t('skip');$('#tutorialNext').textContent=tutorialStep===steps.length-1?t('finish'):t('next');}
+function completeOnboarding(){preferences.onboardingCompleted={...(preferences.onboardingCompleted||{}),[language]:true};savePreferences();closeDialog($('#onboardingDialog'));}
+function setLanguage(next){if(!I18N[next]||next===language)return;language=next;preferences.language=next;savePreferences();applyLanguage();closeDialog($('#settingsDialog'));setTimeout(()=>showOnboarding(),80);}
 
 function palette(song) {
   const warm = song.fingerprint.warmth;
@@ -67,10 +83,10 @@ function mediaObject(song, index = 0, compact = false) {
 
 function renderStore() {
   const store = $('#storeFloor');
-  if (!songs.length) { store.innerHTML = `<div class="store-empty"><p class="store-sign">SONGSCAPE<br><small>BUY · SELL · REMEMBER</small></p><div class="empty-crate"><i></i><i></i><i></i></div><h2>The shelves are empty.</h2><p>挑一种介质，把第一首歌和它的内页笔记放进来。</p><button class="primary-button" data-add type="button">Stock the first record</button></div>`; return; }
+  if (!songs.length) { store.innerHTML = `<div class="store-empty"><p class="store-sign">SONGSCAPE<br><small>BUY · SELL · REMEMBER</small></p><div class="empty-crate"><i></i><i></i><i></i></div><h2>${t('emptyStore')}</h2><p>${t('emptyStoreBody')}</p><button class="primary-button" data-add type="button">${t('stockFirst')}</button></div>`; return; }
   const arrivals=songs.slice(0,4), favorites=songs.filter(s=>s.favorite).slice(0,4), archive=[...songs].sort((a,b)=>Date.parse(a.createdAt)-Date.parse(b.createdAt)).slice(0,4);
-  const shelf=(title,subtitle,items)=>items.length?`<section class="store-department"><div class="department-label"><p>${subtitle}</p><h2>${title}</h2><span>${String(items.length).padStart(2,'0')} ITEMS</span></div><div class="media-shelf">${items.map((s,i)=>mediaObject(s,i)).join('')}</div><div class="wood-shelf"></div></section>`:'';
-  store.innerHTML=`<div class="store-masthead"><span>SONGSCAPE USED MEDIA</span><span>PERSONAL COLLECTION · OPEN LATE</span></div>${shelf('New arrivals','Recently shelved',arrivals)}${shelf('Personal picks','Marked by hand',favorites)}${shelf('Back catalog','From the archive',archive)}`;
+  const shelf=(title,subtitle,items)=>items.length?`<section class="store-department"><div class="department-label"><p>${subtitle}</p><h2>${title}</h2><span>${String(items.length).padStart(2,'0')} ${t('items')}</span></div><div class="media-shelf">${items.map((s,i)=>mediaObject(s,i)).join('')}</div><div class="wood-shelf"></div></section>`:'';
+  store.innerHTML=`<div class="store-masthead"><span>SONGSCAPE USED MEDIA</span><span>PERSONAL COLLECTION · OPEN LATE</span></div>${shelf(t('newArrivals'),t('recent'),arrivals)}${shelf(t('picks'),t('marked'),favorites)}${shelf(t('archive'),t('older'),archive)}`;
 }
 
 function visibleSongs() {
@@ -85,19 +101,19 @@ function render() {
   grid.innerHTML = visible.map((song,index) => mediaObject(song,index,true)).join('');
   const empty = $('#emptyState');
   if (!songs.length) { empty.innerHTML = `<div class="empty-orbit"></div><p class="eyebrow">The first exhibit</p><h3>你的展厅正在等第一首歌</h3><p>从一首你总会回去听的歌开始。无需写得完整，只要写下它为何重要。</p><button class="primary-button" data-add type="button">收藏第一首歌</button>`; empty.classList.remove('hidden'); }
-  else if (!visible.length) { empty.innerHTML = `<div class="empty-orbit"></div><h3>这组线索没有找到歌曲</h3><p>试着换一个词，或清除当前筛选，再翻一翻你的收藏。</p><button class="primary-button" data-reset type="button">清除筛选</button>`; empty.classList.remove('hidden'); }
+  else if (!visible.length) { empty.innerHTML = `<div class="empty-orbit"></div><h3>${t('noResults')}</h3><button class="primary-button" data-reset type="button">${t('reset')}</button>`; empty.classList.remove('hidden'); }
   else empty.classList.add('hidden');
   $('#resetFilters').classList.toggle('hidden', !filters.query && !filters.tag && !filters.favorite);
   renderTagOptions();
 }
 
-function renderTagOptions() { const select=$('#tagFilter'); const current=filters.tag; const tags=[...new Set(songs.flatMap(s=>s.tags))].sort((a,b)=>a.localeCompare(b)); select.innerHTML='<option value="">所有标签</option>'+tags.map(t=>`<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join(''); select.value=current; }
+function renderTagOptions() { const select=$('#tagFilter'); const current=filters.tag; const tags=[...new Set(songs.flatMap(s=>s.tags))].sort((a,b)=>a.localeCompare(b)); select.innerHTML=`<option value="">${t('allTags')}</option>`+tags.map(tag=>`<option value="${escapeHtml(tag)}">${escapeHtml(tag)}</option>`).join(''); select.value=current; }
 function showToast(message) { const toast=$('#toast'); toast.textContent=message; toast.classList.add('show'); clearTimeout(showToast.timer); showToast.timer=setTimeout(()=>toast.classList.remove('show'),2600); }
 function closeDialog(dialog) { if (dialog.open) dialog.close(); }
 function resetFilters() { filters.query='';filters.tag='';filters.favorite=false;$('#searchInput').value='';$('#tagFilter').value='';$('#favoriteFilter').checked=false;render(); }
 
 function openForm(song = null) {
-  $('#songForm').reset(); $('#songId').value=song?.id||''; $('#formTitle').textContent=song?'Edit record':'Add a record'; $('#formEyebrow').textContent=song?'Edit pressing':'New pressing'; $('#formError').textContent='';
+  $('#songForm').reset(); $('#songId').value=song?.id||''; $('#formTitle').textContent=song?t('edit'):t('formTitle'); $('#formEyebrow').textContent=song?t('edit'):t('add'); $('#formError').textContent='';
   document.querySelectorAll('.choice-group button').forEach(b=>b.classList.remove('selected'));
   document.querySelectorAll('.medium-options button').forEach(b=>b.classList.toggle('selected', b.dataset.medium === (song?.medium || 'vinyl')));
   if(song){ ['title','artist','album','artwork','reflection','note'].forEach(k=>document.getElementById(k).value=song[k]||''); ['place','period','person','project'].forEach(k=>document.getElementById(k).value=song.associations[k]||''); $('#tags').value=song.tags.join(', '); $('#favorite').checked=song.favorite; ['mood','energy','warmth'].forEach(k=>document.querySelector(`[data-choice="${k}"] [data-value="${song.fingerprint[k]}"]`)?.classList.add('selected')); }
@@ -121,9 +137,14 @@ document.querySelectorAll('.choice-group').forEach(group=>group.addEventListener
 document.querySelector('.medium-options').addEventListener('click',event=>{const button=event.target.closest('button');if(!button)return;document.querySelectorAll('.medium-options button').forEach(b=>b.classList.remove('selected'));button.classList.add('selected');});
 document.querySelectorAll('dialog').forEach(dialog=>dialog.addEventListener('click',event=>{if(event.target===dialog)dialog.close();}));
 $('#addButton').addEventListener('click',()=>openForm());$('#discoverButton').addEventListener('click',discover);$('#backupButton').addEventListener('click',()=>$('#backupDialog').showModal());$('#resetFilters').addEventListener('click',resetFilters);
+$('#settingsButton').addEventListener('click',()=>{$('#settingsDialog').showModal();document.querySelectorAll('.language-options button').forEach(b=>b.classList.toggle('selected',b.dataset.language===language));});
+document.querySelector('.language-options').addEventListener('click',event=>{const button=event.target.closest('[data-language]');if(button)setLanguage(button.dataset.language);});
+$('#replayOnboarding').addEventListener('click',()=>{closeDialog($('#settingsDialog'));showOnboarding(true);});
+$('#tutorialSkip').addEventListener('click',completeOnboarding);
+$('#tutorialNext').addEventListener('click',()=>{if(tutorialStep<t('steps').length-1){tutorialStep++;renderTutorial();}else completeOnboarding();});
 $('#searchInput').addEventListener('input',e=>{filters.query=e.target.value.trim();render();});$('#tagFilter').addEventListener('change',e=>{filters.tag=e.target.value;render();});$('#favoriteFilter').addEventListener('change',e=>{filters.favorite=e.target.checked;render();});
 $('#exportButton').addEventListener('click',()=>{const payload={app:'Songscape',schemaVersion:SCHEMA_VERSION,exportedAt:new Date().toISOString(),songs};const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});const link=document.createElement('a');link.href=URL.createObjectURL(blob);link.download=`songscape-backup-${new Date().toISOString().slice(0,10)}.json`;link.click();setTimeout(()=>URL.revokeObjectURL(link.href),1000);$('#backupMessage').textContent=`已导出 ${songs.length} 件藏品。`;});
 $('#importInput').addEventListener('change',async event=>{const file=event.target.files[0];if(!file)return;const message=$('#backupMessage');try{const parsed=JSON.parse(await file.text());if(!parsed||parsed.app!=='Songscape'||!Array.isArray(parsed.songs))throw new Error('结构不正确');const imported=parsed.songs.map(normalizeSong);if(imported.some(s=>!s.title||!s.artist||!s.reflection))throw new Error('部分歌曲缺少必填字段');if(!confirm(`备份包含 ${imported.length} 件藏品。继续会替换当前的 ${songs.length} 件藏品，确定吗？`)){message.textContent='已取消导入，现有收藏未改变。';return;}if(Store.save(imported)){songs=imported;resetFilters();message.textContent=`已恢复 ${songs.length} 件藏品。`;showToast('备份恢复完成');}}catch(error){message.textContent=`无法导入：${error.message}。现有收藏未改变。`;}finally{event.target.value='';}});
-songs=Store.load();render();
+songs=Store.load();applyLanguage();setTimeout(()=>showOnboarding(),120);
 
 export { normalizeSong, seedFrom };

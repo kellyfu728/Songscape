@@ -4,6 +4,8 @@ Songscape is a private, browser-local archive for songs and the memories attache
 
 V2 presents the collection as a virtual used-media store. Each song can become vinyl, cassette, CD, or DVD media that can be pulled out, opened, and inspected with its liner notes.
 
+V3 adds complete English and Simplified Chinese interfaces, a six-step store-themed introduction tracked separately per language, and manual tutorial replay from Settings.
+
 ## Features
 
 - Add, edit, delete, cherish, and un-cherish songs
