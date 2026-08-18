@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Songscape — 把歌曲与它们承载的记忆收藏起来。">
+  <title>Songscape · 私人歌曲档案</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#collection">跳到歌曲收藏</a>
+  <header class="site-header">
+    <a class="brand" href="#" aria-label="Songscape 首页"><span class="brand-mark">S/S</span><span>Songscape</span></a>
+    <nav aria-label="主要操作">
+      <a class="nav-link" href="#collection">Records</a>
+      <button class="text-button" id="backupButton" type="button">备份</button>
+      <button class="primary-button" id="addButton" type="button">＋ Add record</button>
+    </nav>
+  </header>
+
+  <main>
+    <section class="intro" aria-labelledby="pageTitle">
+      <div class="intro-index">PRIVATE PRESSING<br>EST. 2026</div>
+      <p class="eyebrow">A personal record store</p>
+      <h1 id="pageTitle">The songs<br>you kept.</h1>
+      <div class="intro-bottom"><p class="intro-copy">每一张唱片都留着一段只有你知道的内页注释。这里收藏歌，也收藏你为何没有把它忘记。</p>
+      <button class="discovery-button" id="discoverButton" type="button"><span>Pull a record</span><small>从唱片箱里随手抽出一张</small></button></div>
+    </section>
+
+    <section id="featured" class="featured-section" aria-label="本次精选唱片"></section>
+
+    <section class="collection-section" id="collection" aria-labelledby="collectionTitle">
+      <div class="collection-heading">
+        <div><p class="eyebrow">The shelves</p><h2 id="collectionTitle">Your records</h2></div>
+        <p id="songCount" aria-live="polite">0 件藏品</p>
+      </div>
+      <div class="tools" aria-label="搜索和筛选">
+        <label class="search-field"><span class="visually-hidden">搜索歌曲</span><input id="searchInput" type="search" placeholder="搜索歌名、艺人、记忆或标签…"></label>
+        <label><span class="visually-hidden">按标签筛选</span><select id="tagFilter"><option value="">所有标签</option></select></label>
+        <label class="favorite-filter"><input id="favoriteFilter" type="checkbox"><span>Favorites only</span></label>
+        <button class="text-button hidden" id="resetFilters" type="button">清除筛选</button>
+      </div>
+      <div id="songGrid" class="song-grid"></div>
+      <section id="emptyState" class="empty-state hidden" aria-live="polite"></section>
+    </section>
+  </main>
+
+  <footer><span>Songscape</span><p>歌会结束，记忆仍有地方停留。</p></footer>
+
+  <dialog id="songDialog" class="modal">
+    <div class="modal-shell">
+      <button class="close-button" data-close type="button" aria-label="关闭">×</button>
+      <form id="songForm" novalidate>
+        <input id="songId" type="hidden">
+        <p class="eyebrow" id="formEyebrow">New exhibit</p>
+        <h2 id="formTitle">Add a record</h2>
+        <p class="form-intro">先记下它为什么留在你身边。其他细节，可以慢慢补齐。</p>
+        <div class="field-row"><label>歌名 <span aria-hidden="true">*</span><input id="title" name="title" required maxlength="160"></label><label>艺人 <span aria-hidden="true">*</span><input id="artist" name="artist" required maxlength="160"></label></div>
+        <label class="reflection-field">我为什么总会回到这首歌？ <span aria-hidden="true">*</span><textarea id="reflection" name="reflection" required maxlength="4000" rows="6" placeholder="也许是一个人、一条路，或某个只属于你的时刻……"></textarea></label>
+        <details><summary>再添一些细节 <span>可选</span></summary>
+          <div class="details-content">
+            <div class="field-row"><label>专辑<input id="album" name="album" maxlength="160"></label><label>封面图片 URL<input id="artwork" name="artwork" type="url" placeholder="https://…"></label></div>
+            <label>私人注记<textarea id="note" name="note" maxlength="4000" rows="4"></textarea></label>
+            <label>标签 <small>用逗号分隔</small><input id="tags" name="tags" maxlength="500" placeholder="雨夜, 公路, 旧唱片"></label>
+            <div class="field-row associations"><label>地点<input id="place" maxlength="160"></label><label>人生阶段<input id="period" maxlength="160"></label><label>某个人<input id="person" maxlength="160"></label><label>项目<input id="project" maxlength="160"></label></div>
+          </div>
+        </details>
+        <fieldset class="mood-controls"><legend>给它一点气候 <small>都可以留空</small></legend>
+          <div class="choice-group" data-choice="mood"><span>情绪</span><button type="button" data-value="calm">平静</button><button type="button" data-value="dreamy">梦幻</button><button type="button" data-value="melancholic">忧郁</button><button type="button" data-value="bright">明亮</button><button type="button" data-value="nostalgic">怀旧</button></div>
+          <div class="choice-group" data-choice="energy"><span>能量</span><button type="button" data-value="quiet">轻柔</button><button type="button" data-value="flowing">流动</button><button type="button" data-value="intense">强烈</button></div>
+          <div class="choice-group" data-choice="warmth"><span>温度</span><button type="button" data-value="cool">清冷</button><button type="button" data-value="neutral">中性</button><button type="button" data-value="warm">温暖</button></div>
+        </fieldset>
+        <label class="cherish-input"><input id="favorite" type="checkbox"><span>把它标为珍藏</span></label>
+        <p id="formError" class="error" role="alert"></p>
+        <div class="form-actions"><button class="text-button" data-close type="button">取消</button><button class="primary-button" type="submit">Add to collection</button></div>
+      </form>
+    </div>
+  </dialog>
+
+  <dialog id="exhibitDialog" class="modal exhibit-modal"><article id="exhibitContent" class="modal-shell"></article></dialog>
+  <dialog id="backupDialog" class="modal"><div class="modal-shell backup-panel"><button class="close-button" data-close type="button" aria-label="关闭">×</button><p class="eyebrow">Your archive</p><h2>备份与恢复</h2><p>导出一份 JSON 文件，保存你的全部歌曲与记忆。导入时会先检查文件，并在覆盖前再次确认。</p><div class="backup-actions"><button class="primary-button" id="exportButton" type="button">导出收藏</button><label class="file-button">选择备份文件<input id="importInput" type="file" accept="application/json,.json"></label></div><p id="backupMessage" class="status-message" role="status"></p></div></dialog>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
