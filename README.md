@@ -2,6 +2,8 @@
 
 Songscape is a private, browser-local archive for songs and the memories attached to them. It keeps not only titles, but why you return to each song and the people, places, and periods of life it holds.
 
+V2 presents the collection as a virtual used-media store. Each song can become vinyl, cassette, CD, or DVD media that can be pulled out, opened, and inspected with its liner notes.
+
 ## Features
 
 - Add, edit, delete, cherish, and un-cherish songs
@@ -16,7 +18,7 @@ Songscape is a private, browser-local archive for songs and the memories attache
 
 ## Run locally
 
-There are no dependencies and no build step. Serve the directory with any static server:
+The final `index.html` contains its CSS and JavaScript, so it can be opened directly on Windows or macOS. It can also be served with any static server:
 
 ```bash
 python -m http.server 8080
