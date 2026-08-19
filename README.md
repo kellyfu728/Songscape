@@ -1,18 +1,19 @@
 # Songscape
 
-Songscape is a private, browser-local archive for songs and the memories attached to them. It keeps not only titles, but why you return to each song and the people, places, and periods of life it holds.
+Songscape is a private, browser-local listening room for songs and the memories attached to them. It keeps not only titles, but why you return to each song and the people, places, and periods of life it holds.
 
 V2 presents the collection as a virtual used-media store. Each song can become vinyl, cassette, CD, or DVD media that can be pulled out, opened, and inspected with its liner notes.
 
-V3 adds complete English and Simplified Chinese interfaces, a six-step store-themed introduction tracked separately per language, and manual tutorial replay from Settings.
+V4 rebuilds the interface as a believable vintage record shop: a walnut-lined room with album walls, wooden shelves, digging crates, a listening table, analog equipment, localized light, and format-specific handling. It also adds a nine-step introduction tracked separately per language and fixes bilingual branding at every breakpoint.
 
 ## Features
 
 - Add, edit, delete, cherish, and un-cherish songs
 - Search titles, artists, reflections, and tags
 - Filter by tag and cherished status
-- Read each song as an individual exhibit
-- “Show Me Something” uniformly selects from the visible collection and avoids an immediate repeat
+- Pull vinyl, cassette, CD, and DVD objects from shelves with distinct opening motion
+- Examine each song on a listening table with liner notes, associations, tags, and fingerprint details
+- “Dig through the crate” uniformly selects from the visible collection and avoids an immediate repeat
 - Deterministic SVG fingerprints generated from each entry’s stable seed, mood, energy, and warmth
 - Local persistence through `localStorage`; no account, backend, or music service required
 - JSON export and validated, confirmation-gated replacement import
@@ -26,7 +27,7 @@ The final `index.html` contains its CSS and JavaScript, so it can be opened dire
 python -m http.server 8080
 ```
 
-Then open `http://localhost:8080`. Opening `index.html` directly may also work, but some browsers restrict ES modules on `file://`, so a static server is more reliable.
+Then open `http://localhost:8080`. The shipped standalone file does not require modules or external assets, so direct opening is supported too.
 
 ## Data and backups
 
@@ -38,6 +39,7 @@ Import accepts structurally valid Songscape backups. It validates every entry an
 
 - `index.html` — semantic page, form, and dialog structure
 - `styles.css` — visual system, responsive behavior, and accessibility styles
+- `v2.css`, `v3.css`, `critical.css`, `v4.css` — successive store, interaction, localization, and environmental design layers
 - `app.js` — normalization, storage, filtering, fingerprint generation, and UI coordination
 - `README.zh-CN.md` — Chinese documentation
 - `README.md` — English documentation
